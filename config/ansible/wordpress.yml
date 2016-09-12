@@ -3,9 +3,6 @@
   become: true
   connection: local
   vars:
-    wordpress_dl_file: 'wordpress-{{ wordpress_ver }}.tar.gz'
-    wordpress_dl_uri: 'https://wordpress.org'
-    wordpress_dl: '{{ wordpress_dl_uri }}/{{ wordpress_dl_file }}'
   roles:
   tasks:
     - name: setting Debian facts
@@ -48,13 +45,3 @@
         - 'php{{ php_ver }}-cli'
         - 'php{{ php_ver }}-cgi'
         - 'php{{ php_ver }}-gd'
-
-    - name: Downloading Wordpress {{ wordpress_ver }}
-      get_url:
-        url: "{{ wordpress_dl }}"
-        dest: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
-
-    - name: Extracting Wordpress {{ wordpress_ver }}
-      unarchive:
-        src: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
-        dest: "{{ wordpress_root_dir }}/"
