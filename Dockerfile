@@ -14,6 +14,12 @@ ENV APACHE2_ENABLE_PHP="true" \
     WORDPRESS_VER="4.6.1" \
     WORDPRESS_ROOT_DIR="/var/www/html"
 
+RUN ansible-playbook -i "localhost," -c local /wordpress.yml \
+    --extra-vars "wordpress_ver=$WORDPRESS_VER wordpress_root_dir=$WORDPRESS_ROOT_DIR" && \
+    apt-get -y clean && \
+    apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Copy Docker Entrypoint
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
