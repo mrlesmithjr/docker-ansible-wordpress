@@ -1,0 +1,34 @@
+version: '2'
+services:
+  db:
+    image: "mrlesmithjr/mysql"
+    volumes:
+      - "db:/var/lib/mysql"
+    restart: "always"
+    environment:
+      MYSQL_ROOT_PASSWORD: "wordpress"
+      MYSQL_DATABASE: "wordpress"
+      MYSQL_USER: "wordpress"
+      MYSQL_PASSWORD: "wordpress"
+  wordpress:
+    image: "mrlesmithjr/wordpress"
+    links:
+      - "db"
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: "always"
+    volumes:
+      - "apache2_www:/var/www"
+    environment:
+      APACHE2_ENABLE_PHP: "true"
+      WORDPRESS_VER: "4.5"
+      WORDPRESS_ROOT_DIR: "/var/www/html"
+      WORDPRESS_DB: "wordpress"
+      WORDPRESS_DB_HOST: "db"
+      WORDPRESS_DB_USER: "wordpress"
+      WORDPRESS_DB_PASSWORD: "wordpress"
+
+volumes:
+  apache2_www:
+  db:

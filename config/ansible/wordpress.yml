@@ -1,0 +1,82 @@
+---
+- hosts: localhost
+  become: true
+  connection: local
+  vars:
+    wordpress_dl_file: 'wordpress-{{ wordpress_ver }}.tar.gz'
+    wordpress_dl_uri: 'https://wordpress.org'
+    wordpress_dl: '{{ wordpress_dl_uri }}/{{ wordpress_dl_file }}'
+  roles:
+  tasks:
+    - name: setting Debian facts
+      set_fact:
+        apache2_log_dir: "/var/log/apache2"
+        apache2_web_group: "www-data"
+        apache2_web_owner: "www-data"
+        apache2_web_root: "/var/www/html"
+      when: ansible_os_family == "Debian"
+
+    - name: setting PHP version
+      set_fact:
+        php_path: 'etc/php5'  #no leading / for template path
+        php_ver: 5
+      when: >
+            ansible_distribution == "Debian" or
+            (ansible_distribution == "Ubuntu" and
+            ansible_distribution_version <= '14.04')
+
+    - name: setting PHP version
+      set_fact:
+        php_path: 'etc/php/7.0'  #no leading / for template path
+        php_ver: 7.0
+      when: >
+            (ansible_distribution == "Ubuntu" and
+            ansible_distribution_version >= '16.04')
+
+    - name: Update Apt-Cache
+      apt:
+        update_cache: yes
+
+    - name: Installing Pre-Reqs
+      apt:
+        name: "{{ item }}"
+        state: "present"
+        install_recommends: no
+      with_items:
+        - 'curl'
+        - 'php{{ php_ver }}-mysql'
+        - 'php{{ php_ver }}-cli'
+        - 'php{{ php_ver }}-cgi'
+        - 'php{{ php_ver }}-gd'
+
+    - name: Downloading Wordpress {{ wordpress_ver }}
+      get_url:
+        url: "{{ wordpress_dl }}"
+        dest: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
+
+    - name: Extracting Wordpress {{ wordpress_ver }}
+      unarchive:
+        src: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
+        dest: "{{ wordpress_root_dir }}/"
+
+    - name: Generating Wordpress Salt
+      command: "curl https://api.wordpress.org/secret-key/1.1/salt/"
+      register: "wordpress_salt"
+
+    - name: Configuring Wordpress
+      template:
+        src: "/wp-config.php.j2"
+        dest: "{{ wordpress_root_dir }}/wordpress/wp-config.php"
+
+    - name: Configuring Wordpress Permissions
+      file:
+        path: "{{ wordpress_root_dir }}"
+        state: "directory"
+        owner: "{{ apache2_web_owner }}"
+        group: "{{ apache2_web_group }}"
+        recurse: yes
+
+    - name: Configuring Wordpress Apache2 Default Site
+      template:
+        src: "/000-default.conf.j2"
+        dest: "/etc/apache2/sites-available/000-default.conf"
