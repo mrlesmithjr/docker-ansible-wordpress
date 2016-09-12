@@ -11,7 +11,7 @@ ENV APACHE2_ENABLE_PHP="true" \
     WORDPRESS_DB_HOST="db" \
     WORDPRESS_DB_USER="wordpress" \
     WORDPRESS_DB_PASSWORD="wordpress" \
-    WORDPRESS_VER="4.6" \
+    WORDPRESS_VER="4.6.1" \
     WORDPRESS_ROOT_DIR="/var/www/html"
 
 # Copy Docker Entrypoint
