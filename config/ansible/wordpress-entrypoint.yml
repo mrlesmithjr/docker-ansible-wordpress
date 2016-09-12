@@ -3,6 +3,9 @@
   become: true
   connection: local
   vars:
+    wordpress_dl_file: 'wordpress-{{ wordpress_ver }}.tar.gz'
+    wordpress_dl_uri: 'https://wordpress.org'
+    wordpress_dl: '{{ wordpress_dl_uri }}/{{ wordpress_dl_file }}'
   roles:
   tasks:
     - name: setting Debian facts
@@ -12,6 +15,16 @@
         apache2_web_owner: "www-data"
         apache2_web_root: "/var/www/html"
       when: ansible_os_family == "Debian"
+
+    - name: Downloading Wordpress {{ wordpress_ver }}
+      get_url:
+        url: "{{ wordpress_dl }}"
+        dest: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
+
+    - name: Extracting Wordpress {{ wordpress_ver }}
+      unarchive:
+        src: "{{ wordpress_root_dir }}/{{ wordpress_dl_file }}"
+        dest: "{{ wordpress_root_dir }}/"
 
     - name: Generating Wordpress Salt
       command: "curl https://api.wordpress.org/secret-key/1.1/salt/"
