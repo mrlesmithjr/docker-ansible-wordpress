@@ -11,7 +11,7 @@ docker run -d --name db -e MYSQL_ROOT_PASSWORD=wordpress \
 ```
 ```
 docker run -d --name wordpress -e APACHE2_ENABLE_PHP="true" \
-  -e WORDPRESS_VER="4.5.4" \
+  -e WORDPRESS_VER="4.6" \
   -e WORDPRESS_ROOT_DIR="/var/www/html" \
   -e WORDPRESS_DB="wordpress" \
   -e WORDPRESS_DB_HOST="db" \

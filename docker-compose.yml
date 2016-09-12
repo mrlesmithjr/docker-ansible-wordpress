@@ -22,7 +22,7 @@ services:
       - "apache2_www:/var/www"
     environment:
       APACHE2_ENABLE_PHP: "true"
-      WORDPRESS_VER: "4.5.4"
+      WORDPRESS_VER: "4.6"
       WORDPRESS_ROOT_DIR: "/var/www/html"
       WORDPRESS_DB: "wordpress"
       WORDPRESS_DB_HOST: "db"
